@@ -109,7 +109,11 @@ button:hover{
   </select>
 
   <input type="number" placeholder="Account Number">
-  <input class="amount" value="₦100,000.00" readonly>
+
+<div>
+  <span>₦</span>
+  <input type="number" class="amount" placeholder="Enter amount" value="100000">
+</div>
 
   <button onclick="window.location.href='withdraw-setup.html'">SUBMIT</button>
   <button onclick="history.back()">GO BACK</button>
