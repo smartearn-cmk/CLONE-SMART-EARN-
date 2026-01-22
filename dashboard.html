@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Earn Dashboard</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body{
+  background:#000;
+  color:#fff;
+}
+
+/* TOP BAR */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 14px;
+  background:#111;
+}
+
+.topbar-left{
+  display:flex;
+  align-items:center;
+}
+
+.topbar-left img{
+  width:38px;
+  height:38px;
+  border-radius:8px;
+}
+
+.topbar-left span{
+  margin-left:10px;
+  font-weight:bold;
+}
+
+.topbar-right i{
+  margin-left:15px;
+}
+
+.underline{
+  height:3px;
+  background:red;
+}
+
+/* WELCOME */
+.welcome{
+  background:#ffd400;
+  color:#000;
+  text-align:center;
+  padding:12px;
+  font-size:20px;
+  font-weight:bold;
+}
+
+/* BALANCE */
+.balance-card{
+  margin:18px;
+  padding:20px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#ffd400,#3b3300);
+  text-align:center;
+}
+
+.balance-card h1{
+  font-size:40px;
+  margin:10px 0;
+}
+
+.balance-card button{
+  padding:12px 26px;
+  border:none;
+  border-radius:20px;
+  font-weight:bold;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  padding:18px;
+}
+
+.grid-item{
+  background:#1c1c1c;
+  border-radius:16px;
+  padding:18px;
+  text-align:center;
+}
+
+.grid-item i{
+  font-size:26px;
+  color:#ffd400;
+  margin-bottom:8px;
+}
+
+/* LOGOUT */
+.logout{
+  margin:18px;
+}
+
+.logout-btn{
+  background:#1c1c1c;
+  padding:16px;
+  border-radius:16px;
+  text-align:center;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <img src="/file_00000000361871f4a4bd5a989713c41b.png" alt="Smart Earn">
+    <span>Smart earn</span>
+  </div>
+  <div class="topbar-right">
+    <i class="fas fa-share-alt"></i>
+    <i class="fas fa-bell"></i>
+  </div>
+</div>
+
+<div class="underline"></div>
+
+<!-- WELCOME -->
+<div class="welcome">
+  Hi, <span id="userName"></span>
+</div>
+
+<!-- BALANCE -->
+<div class="balance-card">
+  <p>Available Balance</p>
+  <h1 id="balance">₦0.00</h1>
+  <button id="claimBtn" onclick="claimBonus()">Claim Bonus</button>
+</div>
+
+<!-- Notification banner -->
+<div id="notify" style="
+  position:fixed;
+  top:-120px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#ffd400;
+  color:#000;
+  padding:14px 24px;
+  border-radius:12px;
+  font-weight:bold;
+  transition:top .4s ease;
+  z-index:999;
+"></div>
+
+<!-- Audio -->
+<audio id="claimSound">
+  <source src="claim.mp3" type="audio/mpeg">
+</audio>
+
+<!-- MENU -->
+<div class="grid">
+  <div class="grid-item" onclick="window.location.href='support.html'"><i class="fas fa-headset"></i><p>Support</p></div>
+  <div class="grid-item" onclick="window.location.href='groups.html'"><i class="fas fa-users"></i><p>Groups</p></div>
+  <div class="grid-item" onclick="window.location.href='withdraw.html'"><i class="fas fa-arrow-up"></i><p>Withdraw</p></div>
+
+  <div class="grid-item"><i class="fas fa-mobile-alt"></i><p>Airtime</p></div>
+  <div class="grid-item"><i class="fas fa-wifi"></i><p>Data</p></div>
+  <div class="grid-item"><i class="fas fa-dice"></i><p>Betting</p></div>
+
+  <div class="grid-item"><i class="fas fa-tv"></i><p>TV</p></div>
+  <div class="grid-item"><i class="fas fa-user-plus"></i><p>Invite</p></div>
+  <div class="grid-item"><i class="fas fa-ellipsis-h"></i><p>More</p></div>
+</div>
+
+<!-- LOGOUT -->
+<div class="logout">
+  <div class="logout-btn" onclick="logout()">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </div>
+</div>
+
+<script>
+const user = localStorage.getItem("smartEarnUser");
+
+if(user){
+  document.getElementById("userName").textContent = user;
+}else{
+  window.location.href = "index.html";
+}
+
+function logout(){
+  localStorage.removeItem("smartEarnUser");
+  window.location.href = "index.html";
+}
+
+function claimBonus(){
+  document.getElementById("claimSound").play();
+
+  const balanceEl = document.getElementById("balance");
+  const btn = document.getElementById("claimBtn");
+  const notify = document.getElementById("notify");
+
+  const user = localStorage.getItem("smartEarnUser") || "User";
+
+  btn.disabled = true;
+  btn.innerText = "Processing...";
+
+  const glitchAmounts = ["₦20,000", "₦80,000", "₦50,000", "₦10,000"];
+  let i = 0;
+
+  const glitch = setInterval(() => {
+    balanceEl.innerText = glitchAmounts[i];
+    i++;
+
+    if(i === glitchAmounts.length){
+      clearInterval(glitch);
+
+      setTimeout(() => {
+        balanceEl.innerText = "₦100,000";
+
+        notify.innerHTML = `
+          Dear <b>${user}</b>, you have successfully claimed <b>₦100,000</b>
+        `;
+        notify.style.top = "20px";
+
+        setTimeout(() => {
+          notify.style.top = "-120px";
+        }, 4000);
+
+      }, 500);
+    }
+  }, 500);
+}
+</script>
+
+</body>
+</html>
